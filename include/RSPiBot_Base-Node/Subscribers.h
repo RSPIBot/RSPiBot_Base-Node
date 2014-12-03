@@ -2,7 +2,6 @@
 #define SUBSCRIBERS_H_
 
 #include "../../../multithreading/include_all.h"
-#include "DataTypes.h"
 
 /*ros includes */
 #include "ros/ros.h"
@@ -26,23 +25,11 @@
 \**************************************************************************************/
 /* Get mailbox functions */
 /**
- * Get a mailbox for the positionData
+ * Get a mailbox for the ArduinoCommands
  *
- * @return a pointer to a mailbox with positionData of size(1)
+ * @return a pointer to a mailbox with positionData
  */
-Mailbox<PositionData>* Sub_GetPositionDataMailbox();
-/**
- * Get a mailbox for the LaserData
- *
- * @return a pointer to a mailbox with positionData of size(1)
- */
-Mailbox<LaserData>* Sub_GetLaserDataMailbox();
-/**
- * Get a mailbox for the robotList
- *
- * @return a pointer to a mailbox with positionData of size(1)
- */
-Mailbox<RobotList>* Sub_GetRobotListMailbox();
+Mailbox<std::string>* Sub_GetArduinoCommandMailbox();
 
 /**
  * Initialise all the mailboxes
@@ -52,30 +39,15 @@ Mailbox<RobotList>* Sub_GetRobotListMailbox();
  */
 void Sub_Init(ros::NodeHandle* p_nh, int mailBoxVectorSize);
 
-/* general functions */
-void Sub_SetRobotNumber(int number);
-
 /* callback functions */
 
 /**
- * This function does some pre porssessing over the odom data and puts the data in the mailboxes
+ * This function does some pre porssessing over the message data and puts the data in the mailboxes
  *
- * @param odom the odom data
+ * @param the message
  */
-void Sub_OdomCallback(const nav_msgs::Odometry::ConstPtr& odom);
+void Sub_ArduinoCommandCallback(const std_msgs::String::ConstPtr& msg);
 
-/**
- * This function does some pre porssessing over the laser data and puts the data in the mailboxes
- *
- * @param laser the laser data
- */
-void Sub_LaserCallback(const sensor_msgs::LaserScan::ConstPtr& laser);
 
-/**
- * This function does some pre porssessing over the string data and puts the data in the mailboxes
- *
- * @param msg the robotlist
- */
-void Sub_RobotListCallback(const std_msgs::String::ConstPtr& msg);
 
 #endif

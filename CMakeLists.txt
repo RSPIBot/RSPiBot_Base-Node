@@ -1,10 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(RSPiBot_Base-Node)
+project(RSPiBot_Base_Node)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  rospy
+  std_msgs
+  geometry_msgs
+  tf
+  nav_msgs
+)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -90,13 +97,51 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 
+include_directories(
+  include
+  ../multithreading
+  ../SerialPort
+  ${catkin_INCLUDE_DIRS}
+)
+
+## Declare a cpp library
+ 
+  add_library(serialport
+   ../SerialPort/SerialPort.cpp
+ )
+ 
+ #add_library(mutex
+ # ../multithreading/mutex_linux.cpp																																																																								
+#)
+ 
+ #add_library(thread
+ #  ../multithreading/thread_general.cpp ../multithreading/thread_linux.cpp
+ #)
+ 
+  add_library(rsbotbase-subscriber
+   src/Subscribers.cpp
+ )
+
 ## Declare a cpp library
 # add_library(RSPiBot_Base-Node
 #   src/${PROJECT_NAME}/RSPiBot_Base-Node.cpp
 # )
 
 ## Declare a cpp executable
-# add_executable(RSPiBot_Base-Node_node src/RSPiBot_Base-Node_node.cpp)
+# add_executable(RSPiBotBase src/RSPiBot_Base_Node_node.cpp)
+
+add_executable(rsbotbase src/main.cpp)
+
+target_link_libraries(rsbotbase ${catkin_LIBRARIES})
+target_link_libraries(rsbotbase serialport)
+target_link_libraries(rsbotbase mutex)
+target_link_libraries(rsbotbase thread)
+target_link_libraries(rsbotbase rsbotbase-subscriber)
+
+
+target_link_libraries(rsbotbase-subscriber mutex)
+target_link_libraries(rsbotbase-subscriber thread)
+
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
