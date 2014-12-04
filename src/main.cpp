@@ -16,41 +16,79 @@ SerialPort port = SerialPort(portName, true);
 struct PublisherInfo
 {
 	std::string name;
-	int frequency;
-	clock_t lastUpdate;
 	ros::Publisher publisher;
 };
 
 std::vector<PublisherInfo> publishers;
 
-void Publish()
+void Publish(std::string name, std::string data, void* n)
 {
+	ros::NodeHandle *nh = (ros::NodeHandle*)n;
+	bool found = false;
+	std_msgs::String msg;
+	msg.data = data;
+	
+	//printf("%s, %s \r\n",name.c_str(),data.c_str());
+	
+	for (int i = 0; i < publishers.size(); i++)
+		if (publishers.at(i).name == name)
+		{
+			publishers.at(i).publisher.publish(msg);
+			found = true;
+			break;
+		}
+	if(!found)
+	{
+		PublisherInfo pubInfo;
+		pubInfo.name = name;
+		std::string pubname = "/rspibotarduino/"+name;
+		pubInfo.publisher = nh->advertise<std_msgs::String>(pubname.c_str(), 1000);
+		pubInfo.publisher.publish(msg);
+		publishers.push_back(pubInfo);
+	}
+}
+
+void ExtractData (void* n)
+{
+	std::string name = "";
+	std::string data = "";
 	for (int i = start; i <= stop; i++)
 	{
+
 		if (buffer[i] == '/')
 		{
-			printf("The name is ");
+			//printf("The name is ");
 			for (int j = i+1; j <= stop; j++)
 			{
 				if (buffer[j] == '=')
 					break;
-				printf("%c",buffer[j]);  
-
+				name +=buffer[j];
+				//printf("%c",buffer[j]);  
 			}
+			//printf("%s",name.c_str());
 		}
 			 
 		if (buffer[i] == '=')
 		{
-			printf(" and its value is ");
+			//printf(" and its value is ");
 			for (int j = i+1; j <= stop; j++)
 			{
 				if (buffer[j] =='/')
 					break;
-				printf("%c",buffer[j]);  
+				data += buffer[j];
+				//printf("%c",buffer[j]);  
 			}
-			printf("\r\n");
+			//printf("\r\n");
+			
 		}
-			 
+		
+		if (name != "" && data != "")
+		{
+			//printf("%s, %s \r\n",name.c_str(),data.c_str());
+			Publish(name, data, n);	
+			name = "";
+			data = "";
+		} 
 	}
 }
 int ReceiveThread(void* ptr)
@@ -70,7 +108,7 @@ int ReceiveThread(void* ptr)
 			counter++;
 			if (start > 0 && stop > start)
 			{
-				Publish();
+				ExtractData(ptr);
 				counter = 0;
 				start = -1;
 				stop = -1;
@@ -99,6 +137,7 @@ int main(int argc, char **argv)
 	
 	Thread reciveThread;
 	reciveThread.SetThreadFunction(&ReceiveThread);
+	reciveThread.SetParam(&n);
 	reciveThread.Start();
 	
 	ros::Rate loop_rate(10);
