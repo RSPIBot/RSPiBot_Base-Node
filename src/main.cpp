@@ -11,7 +11,7 @@ int out = 0;
 int start = -1;
 int stop = -1;
 
-SerialPort port = SerialPort(portName, true);
+SerialPort port = SerialPort(portName, false);
 
 struct PublisherInfo
 {
@@ -122,6 +122,28 @@ int ReceiveThread(void* ptr)
 	}
 	return 0;
 }
+int SendThread(void* ptr)
+{
+	usleep(100);
+	Mailbox<std::string>* commandMail = Sub_GetArduinoCommandMailbox();
+	while(true)
+	{
+		if(!commandMail->IsEmpty())
+		{
+			std::string stringMessage = commandMail->GetMessage();
+			printf("sending message %s", stringMessage.c_str());
+			const char* message = "DR150FS";//stringMessage.c_str();
+			port.Write((void*)message, sizeof(message));
+		}
+		else
+		{
+			usleep(100);
+		}
+	}
+			
+	return 0;
+}
+
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "RSPiBot_Base_Node", ros::init_options::AnonymousName);
@@ -139,6 +161,11 @@ int main(int argc, char **argv)
 	reciveThread.SetThreadFunction(&ReceiveThread);
 	reciveThread.SetParam(&n);
 	reciveThread.Start();
+	
+	Thread sendThread;
+	sendThread.SetThreadFunction(&SendThread);
+	sendThread.SetParam(&n);
+	sendThread.Start();
 	
 	ros::Rate loop_rate(10);
 	while (ros::ok());
