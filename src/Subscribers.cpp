@@ -45,7 +45,7 @@ Mailbox<std::string>* Sub_GetArduinoCommandMailbox()
 
 void Sub_Init(ros::NodeHandle* p_nh, int mailBoxVectorSize)
 {
-	sub_arduinoCommand = p_nh->subscribe("/aruino", 1000, Sub_ArduinoCommandCallback);
+	sub_arduinoCommand = p_nh->subscribe("/rspibot/aruinoCommands", 1000, Sub_ArduinoCommandCallback);
 
 	sub_v_arduinoCommandMailbox.reserve(mailBoxVectorSize);
 }
