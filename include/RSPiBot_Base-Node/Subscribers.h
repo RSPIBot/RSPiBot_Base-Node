@@ -1,7 +1,7 @@
 #ifndef SUBSCRIBERS_H_
 #define SUBSCRIBERS_H_
 
-#include "../../../multithreading/include_all.h"
+#include "../../../rs_multithreading/include_all.h"
 
 /*ros includes */
 #include "ros/ros.h"

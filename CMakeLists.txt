@@ -14,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
+find_package(pthread)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -98,24 +98,24 @@ catkin_package(
 
 include_directories(
   include
-  ../multithreading
-  ../SerialPort
+  ../rs_multithreading
+  ../rs_SerialPort
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
  
   add_library(serialport
-   ../SerialPort/SerialPort.cpp
+   ../rs_SerialPort/SerialPort.cpp
  )
  
- #add_library(mutex
- # ../multithreading/mutex_linux.cpp																																																																								
-#)
+add_library(rs_mutex
+   ../rs_multithreading/mutex_linux.cpp																																																																								
+ )
  
- #add_library(thread
- #  ../multithreading/thread_general.cpp ../multithreading/thread_linux.cpp
- #)
+ add_library(rs_thread
+   ../rs_multithreading/thread_general.cpp ../rs_multithreading/thread_linux.cpp
+ )
  
   add_library(rsbotbase-subscriber
    src/Subscribers.cpp
@@ -133,13 +133,13 @@ add_executable(rsbotbase src/main.cpp)
 
 target_link_libraries(rsbotbase ${catkin_LIBRARIES})
 target_link_libraries(rsbotbase serialport)
-target_link_libraries(rsbotbase mutex)
-target_link_libraries(rsbotbase thread)
+target_link_libraries(rsbotbase rs_mutex)
+target_link_libraries(rsbotbase rs_thread)
 target_link_libraries(rsbotbase rsbotbase-subscriber)
 
 
-target_link_libraries(rsbotbase-subscriber mutex)
-target_link_libraries(rsbotbase-subscriber thread)
+target_link_libraries(rsbotbase-subscriber rs_mutex)
+target_link_libraries(rsbotbase-subscriber rs_thread)
 
 
 ## Add cmake target dependencies of the executable/library

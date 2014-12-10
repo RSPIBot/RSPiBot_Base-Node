@@ -21,8 +21,8 @@ Changes		:
 \**************************************************************************************/
 #include "ros/ros.h"
 #include "std_msgs/String.h"
-#include "../../../SerialPort/SerialPort.h"
-#include "../../../multithreading/include_all.h"
+#include "../../../rs_SerialPort/SerialPort.h"
+#include "../../../rs_multithreading/include_all.h"
 #include <sstream>
 #include <unistd.h>
 #include <ctime>
